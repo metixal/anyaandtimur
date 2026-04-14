@@ -699,10 +699,10 @@
     buildMarqueeFromFiles('marqueeRight', withFallback(strip2));
 
     // --------------------------------------------------------------
-    // Альбом по файлам: images/album/jpg1.jpg ... jpg50.jpg
+    // Альбом по файлам: images/album/jpg1.jpg ... jpg48.jpg
     const albumGrid = document.getElementById('albumGrid');
     if (albumGrid) {
-        const albumPhotos = Array.from({ length: 50 }, (_, i) => {
+        const albumPhotos = Array.from({ length: 48 }, (_, i) => {
             const n = i + 1;
             const file = `images/album/jpg${n}.jpg`;
             return { n, file, fallback: svgPlaceholder(`Фото ${n}`) };
