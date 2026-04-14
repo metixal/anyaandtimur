@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Анечка × Тима — вместе</title>
+    <!-- Шрифты и стили -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Manrope:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root{
+            --bg0:#f5d9e6;
+            --bg1:#efc6dc;
+            --bg2:#e6b3cf;
+            --panel:rgba(255, 255, 255, 0.72);
+            --panel2:rgba(255, 255, 255, 0.55);
+            --stroke:rgba(150, 34, 92, 0.14);
+            --stroke2:rgba(60, 12, 42, 0.10);
+            --text:#f7f2fb;
+            --muted:rgba(247,242,251,0.78);
+            --accent:#ff4f9a;   /* романтичная роза */
+            --accent2:#b07bff;  /* мягкий лиловый */
+            --gold:#d7a24b;     /* тёплая искра */
+            --romantic-panel:
+              radial-gradient(900px 650px at 20% 15%, rgba(255,130,190,0.22), transparent 62%),
+              radial-gradient(900px 650px at 85% 25%, rgba(176,123,255,0.16), transparent 65%),
+              linear-gradient(145deg, rgba(102, 16, 58, 0.96) 0%, rgba(58, 8, 34, 0.96) 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            font-family: 'Manrope', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+            color: var(--text);
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        /* фоновые сердечки */
+        .bg-hearts {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .bg-heart {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            will-change: transform, opacity;
+            filter: drop-shadow(0 6px 12px rgba(255, 102, 192, 0.18));
+            opacity: 0.55;
+            animation-name: bgFall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+        @keyframes bgFall {
+            0% { transform: translate3d(var(--x), -60px, 0) rotate(0deg); opacity: 0; }
+            8% { opacity: var(--o); }
+            100% { transform: translate3d(calc(var(--x) + var(--drift)), calc(100vh + 80px), 0) rotate(var(--rot)); opacity: 0; }
+        }
+
+        /* кастомный скролл */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(60, 12, 42, 0.10);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,79,154,0.55);
+            border-radius: 10px;
+        }
+
+        /* контейнер */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            position: relative;
+            z-index: 1; /* поверх фоновых сердечек */
+        }
+
+        /* Хедер */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+        .hero h1 {
+            font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+            font-size: 3.2rem;
+            background: linear-gradient(135deg, rgba(255,79,154,0.95), rgba(176,123,255,0.92));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 18px rgba(255,79,154,0.18);
+        }
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.92;
+            font-weight: 400;
+            color: rgba(255,255,255,0.88);
+            text-shadow: 0 2px 16px rgba(255,79,154,0.18), 0 1px 2px rgba(0,0,0,0.55);
+        }
+        .heart-icon {
+            font-size: 2.2rem;
+            animation: pulse 1.8s infinite;
+            color: var(--accent);
+            margin-top: 0.8rem;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); text-shadow: 0 0 0 rgba(255,77,143,0.4);}
+            70% { transform: scale(1.1); text-shadow: 0 0 15px #ff66c0;}
+            100% { transform: scale(0.95);}
+        }
+
+        /* Таймер — главная фишка */
+        .timer-section {
+            background: var(--romantic-panel);
+            backdrop-filter: blur(12px);
+            border-radius: 34px;
+            padding: 1.8rem 2rem;
+            margin-bottom: 4rem;
+            border: 1px solid rgba(255,255,255,0.16);
+            box-shadow: 0 26px 54px -30px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.06) inset;
+            color: rgba(255,255,255,0.90);
+        }
+        .timer-title {
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 400;
+            text-align: center;
+            color: rgba(255,255,255,0.80);
+            margin-bottom: 1rem;
+        }
+        .timer-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            text-align: center;
+        }
+        .timer-card {
+            background: rgba(255,255,255,0.70);
+            padding: 1.05rem 1.3rem;
+            border-radius: 18px; /* без кругляшей */
+            min-width: 140px;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 14px 34px rgba(60,12,42,0.18);
+            border: 1px solid rgba(60,12,42,0.08);
+        }
+        .timer-number {
+            font-size: 3.6rem;
+            font-weight: 800;
+            font-family: 'Manrope', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+            background: none;
+            background-clip: initial;
+            -webkit-background-clip: initial;
+            color: #000;
+            -webkit-text-fill-color: #000;
+            line-height: 1;
+        }
+        .timer-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.6px;
+            color: rgba(106,45,79,0.75);
+        }
+        @media (max-width: 650px) {
+            .timer-number { font-size: 2.8rem; }
+            .timer-card { min-width: 85px; padding: 0.5rem 0.8rem; }
+            .timer-grid { gap: 0.8rem; }
+            .hero h1 { font-size: 2.4rem; }
+        }
+
+        /* заголовки секций */
+        .section-title {
+            font-size: 2rem;
+            text-align: center;
+            margin: 3rem 0 1rem;
+            font-weight: 600;
+        }
+        .section-title i {
+            margin: 0 12px;
+            color: rgba(255,79,154,0.92);
+        }
+        .section-sub {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        /* ленты-«карусели» с фото (крутятся в разные стороны) */
+        .marquee {
+            background: var(--romantic-panel);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 42px;
+            padding: 18px;
+            overflow: hidden;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 22px 46px -24px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05) inset;
+        }
+        .marquee + .marquee { margin-top: 14px; }
+        .marquee-controls{
+            display:flex;
+            align-items:center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .marquee-controls .file-hint{ font-size: 0.9rem; opacity: 0.9; }
+        .marquee-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            width: max-content;
+            animation: scrollLeft 26s linear infinite;
+            will-change: transform;
+        }
+        .marquee-row.reverse { animation-name: scrollRight; animation-duration: 30s; }
+        @keyframes scrollLeft {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+        @keyframes scrollRight {
+            from { transform: translateX(-50%); }
+            to { transform: translateX(0); }
+        }
+        .marquee:hover .marquee-row { animation-play-state: paused; }
+        .marquee-card {
+            width: 190px;
+            height: 190px;
+            border-radius: 34px;
+            position: relative;
+            overflow: hidden;
+            flex: 0 0 auto;
+            border: 1px solid var(--stroke2);
+            box-shadow: 0 12px 22px rgba(0,0,0,0.35);
+        }
+        .marquee-card img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+        .marquee-badge {
+            position: absolute;
+            left: 12px;
+            bottom: 12px;
+            padding: 8px 10px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.55);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #ffe0f0;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            backdrop-filter: blur(8px);
+        }
+        .marquee-hint {
+            text-align: center;
+            opacity: 0.85;
+            margin-top: 10px;
+            font-size: 0.95rem;
+        }
+
+        /* SoundCloud */
+        .soundcloud-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+        @media (max-width: 900px) { .soundcloud-grid { grid-template-columns: 1fr; } }
+        .soundcloud-card {
+            background: var(--panel2);
+            border: 1px solid var(--stroke);
+            border-radius: 28px;
+            padding: 12px;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 18px 34px -18px rgba(0,0,0,0.7);
+        }
+        .soundcloud-card h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin: 0 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255,203,232,0.92);
+        }
+        .soundcloud-embed {
+            width: 100%;
+            border: 0;
+            border-radius: 22px;
+            overflow: hidden;
+        }
+
+        /* альбом на 50 фото */
+        .album {
+            background: var(--romantic-panel);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 48px;
+            padding: 18px;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 22px 46px -24px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05) inset;
+        }
+        .album-controls{
+            display:flex;
+            flex-wrap:wrap;
+            align-items:center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 10px 6px 16px;
+        }
+        .file-btn{
+            display:inline-flex;
+            align-items:center;
+            gap:10px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(0,0,0,0.18);
+            color: rgba(255,255,255,0.88);
+            cursor:pointer;
+            user-select:none;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+        .file-btn:hover{ transform: translateY(-1px); background: rgba(0,0,0,0.26); }
+        .file-hint{
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.78);
+        }
+        .file-input{ display:none; }
+        .album-grid {
+            column-count: 2;
+            column-gap: 14px;
+        }
+        @media (max-width: 520px)  { .album-grid { column-count: 1; } }
+        .album-item {
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid var(--stroke2);
+            background: rgba(9,7,18,0.9);
+            box-shadow: 0 10px 18px rgba(0,0,0,0.25);
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+            display: inline-block; /* для колонок */
+            width: 100%;
+            margin: 0 0 14px;
+            break-inside: avoid;
+        }
+        .album-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 26px rgba(0,0,0,0.38);
+            border-color: rgba(255,106,169,0.75);
+        }
+        .album-item img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            display: block;
+        }
+        .album-num {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.55);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #ffe0f0;
+            font-size: 0.8rem;
+            font-weight: 700;
+            backdrop-filter: blur(8px);
+        }
+
+        /* модалка при клике */
+        .modal {
+            display: none;
+            position: fixed;
+            top:0; left:0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .modal img {
+            max-width: 85vw;
+            max-height: 85vh;
+            border-radius: 32px;
+            box-shadow: 0 0 40px #ff66c0;
+            border: 2px solid white;
+        }
+        .close-modal {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            font-size: 3rem;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* кнопка-сюрприз */
+        .surprise-btn {
+            display: block;
+            margin: 3rem auto 2rem;
+            background: linear-gradient(95deg, rgba(255,106,169,0.95), rgba(176,139,255,0.92));
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 60px;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 10px 28px rgba(255,106,169,0.18);
+            width: fit-content;
+            font-family: inherit;
+        }
+        .surprise-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 16px 36px rgba(255,106,169,0.28);
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+        .floating-hearts {
+            position: fixed;
+            bottom: 15px;
+            right: 20px;
+            pointer-events: none;
+            font-size: 1.7rem;
+            animation: floatHeart 3s infinite;
+            z-index: 99;
+        }
+        @keyframes floatHeart {
+            0% { transform: translateY(0px); opacity: 0.7;}
+            100% { transform: translateY(-35px); opacity: 0;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-hearts" id="bgHearts" aria-hidden="true"></div>
+
+<div class="container">
+    <div class="hero">
+        <h1>Мы вместе</h1>
+        <p>мы вместе — и это лучшая история</p>
+        <div class="heart-icon"><i class="fas fa-heart"></i> <i class="fas fa-infinity"></i> <i class="fas fa-heart"></i></div>
+    </div>
+
+    <!-- Таймер с 1 октября 2025 по сейчас -->
+    <div class="timer-section">
+        <div class="timer-title"><i class="far fa-calendar-alt"></i> С 1 октября 2025 — до этой секунды</div>
+        <div class="timer-grid">
+            <div class="timer-card"><div class="timer-number" id="years">0</div><div class="timer-label">Лет</div></div>
+            <div class="timer-card"><div class="timer-number" id="months">0</div><div class="timer-label">Мес</div></div>
+            <div class="timer-card"><div class="timer-number" id="days">0</div><div class="timer-label">Дней</div></div>
+            <div class="timer-card"><div class="timer-number" id="hours">0</div><div class="timer-label">Часов</div></div>
+            <div class="timer-card"><div class="timer-number" id="minutes">0</div><div class="timer-label">Минут</div></div>
+            <div class="timer-card"><div class="timer-number" id="seconds">0</div><div class="timer-label">Секунд</div></div>
+        </div>
+        <div style="text-align: center; margin-top: 1rem; font-size: 0.85rem;">❤️ ❤️ ❤️</div>
+    </div>
+
+    <!-- крутящиеся фото-ленты -->
+    <div class="section-title">
+        <i class="fas fa-camera-retro"></i> Наши фото <i class="fas fa-arrows-left-right"></i>
+    </div>
+    <div class="section-sub">Здесь будут ваши фото. Наведи курсор — лента остановится. Кликни — откроется крупно.</div>
+    <div class="marquee" aria-label="Фото-лента Тима">
+        <div class="marquee-row" id="marqueeLeft"></div>
+        <div class="marquee-controls">
+            <label class="file-btn" for="marqueeLeftPicker"><i class="fas fa-upload"></i> Выбрать фото для ленты 1</label>
+            <input class="file-input" id="marqueeLeftPicker" type="file" accept="image/*" multiple />
+            <div class="file-hint">Выдели несколько фото.</div>
+        </div>
+    </div>
+    <div class="marquee" aria-label="Фото-лента Анечка">
+        <div class="marquee-row reverse" id="marqueeRight"></div>
+        <div class="marquee-controls">
+            <label class="file-btn" for="marqueeRightPicker"><i class="fas fa-upload"></i> Выбрать фото для ленты 2</label>
+            <input class="file-input" id="marqueeRightPicker" type="file" accept="image/*" multiple />
+            <div class="file-hint">Можно другие фото.</div>
+        </div>
+    </div>
+
+    <!-- SoundCloud -->
+    <div class="section-title">
+        <i class="fa-brands fa-soundcloud"></i> Наши песни
+    </div>
+    <div class="section-sub">Вставь ссылки на треки/плейлисты SoundCloud, которые ассоциируются с отношениями.</div>
+    <div class="soundcloud-grid">
+        <div class="soundcloud-card">
+            <h3><i class="fas fa-heart"></i> Песня №1</h3>
+            <iframe class="soundcloud-embed" height="140" scrolling="no" frameborder="no" allow="autoplay"
+                    src="https://w.soundcloud.com/player/?url=PASTE_SOUNDCLOUD_URL_1&color=%23ff66c0&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true">
+            </iframe>
+        </div>
+        <div class="soundcloud-card">
+            <h3><i class="fas fa-heart"></i> Песня №2</h3>
+            <iframe class="soundcloud-embed" height="140" scrolling="no" frameborder="no" allow="autoplay"
+                    src="https://w.soundcloud.com/player/?url=PASTE_SOUNDCLOUD_URL_2&color=%23ff66c0&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true">
+            </iframe>
+        </div>
+        <div class="soundcloud-card">
+            <h3><i class="fas fa-heart"></i> Песня №3</h3>
+            <iframe class="soundcloud-embed" height="140" scrolling="no" frameborder="no" allow="autoplay"
+                    src="https://w.soundcloud.com/player/?url=PASTE_SOUNDCLOUD_URL_3&color=%23ff66c0&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true">
+            </iframe>
+        </div>
+        <div class="soundcloud-card">
+            <h3><i class="fas fa-heart"></i> Песня №4</h3>
+            <iframe class="soundcloud-embed" height="140" scrolling="no" frameborder="no" allow="autoplay"
+                    src="https://w.soundcloud.com/player/?url=PASTE_SOUNDCLOUD_URL_4&color=%23ff66c0&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true">
+            </iframe>
+        </div>
+    </div>
+
+    <!-- Альбом 50 фото -->
+    <div class="section-title">
+        <i class="fas fa-images"></i> Альбом из 50 фото
+    </div>
+    <div class="section-sub">Чтобы не переименовывать файлы — просто выбери все фото разом, и они сразу появятся здесь.</div>
+    <div class="album">
+        <div class="album-controls">
+            <label class="file-btn" for="albumPicker"><i class="fas fa-upload"></i> Выбрать фото для альбома</label>
+            <input class="file-input" id="albumPicker" type="file" accept="image/*" multiple />
+            <div class="file-hint">Можно выделить сразу все 50 (или сколько есть).</div>
+        </div>
+        <div class="album-grid" id="albumGrid"></div>
+    </div>
+
+    <button class="surprise-btn" id="surpriseBtn"><i class="fas fa-gift"></i> Сюрприк для тебя, родная <i class="fas fa-sparkles"></i></button>
+</div>
+
+<div id="imageModal" class="modal">
+    <span class="close-modal">&times;</span>
+    <img id="modalImg" src="" alt="увеличенное фото">
+</div>
+
+<div class="floating-hearts" id="floatingHeart">💖</div>
+
+<script>
+    // Фоновые сердечки (медленно падают сверху вниз)
+    (function initBackgroundHearts() {
+        const container = document.getElementById('bgHearts');
+        if (!container) return;
+
+        const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReduced) return;
+
+        const HEARTS = ['💗','💖','💕','💘','💝'];
+        const count = Math.min(44, Math.max(18, Math.floor(window.innerWidth / 28)));
+
+        function rand(min, max) { return Math.random() * (max - min) + min; }
+
+        container.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+            const el = document.createElement('div');
+            el.className = 'bg-heart';
+            el.textContent = HEARTS[Math.floor(Math.random() * HEARTS.length)];
+
+            const size = rand(10, 18);
+            const duration = rand(18, 34);
+            const delay = rand(-duration, 0);
+            const x = rand(0, 100).toFixed(2) + 'vw';
+            const drift = rand(-6, 6).toFixed(2) + 'vw';
+            const rot = rand(-35, 35).toFixed(1) + 'deg';
+            const o = rand(0.18, 0.55).toFixed(2);
+
+            el.style.fontSize = size + 'px';
+            el.style.animationDuration = duration + 's';
+            el.style.animationDelay = delay + 's';
+            el.style.setProperty('--x', x);
+            el.style.setProperty('--drift', drift);
+            el.style.setProperty('--rot', rot);
+            el.style.setProperty('--o', o);
+
+            container.appendChild(el);
+        }
+    })();
+
+    // ДАТА НАЧАЛА ОТНОШЕНИЙ: 1 ОКТЯБРЯ 2025 ГОДА (локальное время)
+    const startDate = new Date(2025, 9, 1, 0, 0, 0); // месяцы: 0-11, 9 = октябрь
+
+    function pad2(n) { return String(n).padStart(2, '0'); }
+
+    function diffCalendar(from, to) {
+        if (to <= from) return { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+
+        let years = to.getFullYear() - from.getFullYear();
+        let months = to.getMonth() - from.getMonth();
+        let days = to.getDate() - from.getDate();
+        let hours = to.getHours() - from.getHours();
+        let minutes = to.getMinutes() - from.getMinutes();
+        let seconds = to.getSeconds() - from.getSeconds();
+
+        if (seconds < 0) { seconds += 60; minutes -= 1; }
+        if (minutes < 0) { minutes += 60; hours -= 1; }
+        if (hours < 0) { hours += 24; days -= 1; }
+
+        if (days < 0) {
+            const prevMonth = new Date(to.getFullYear(), to.getMonth(), 0).getDate(); // дней в предыдущем месяце
+            days += prevMonth;
+            months -= 1;
+        }
+        if (months < 0) { months += 12; years -= 1; }
+
+        return { years, months, days, hours, minutes, seconds };
+    }
+
+    function setText(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = value;
+    }
+
+    function updateTimer() {
+        const now = new Date();
+        const d = diffCalendar(startDate, now);
+        setText('years', d.years);
+        setText('months', d.months);
+        setText('days', d.days);
+        setText('hours', pad2(d.hours));
+        setText('minutes', pad2(d.minutes));
+        setText('seconds', pad2(d.seconds));
+    }
+
+    updateTimer();
+    setInterval(updateTimer, 1000);
+
+    // --------------------------------------------------------------
+    // ПЛЕЙСХОЛДЕРЫ ДЛЯ ВАШИХ ФОТО
+    // - Ленты: замените пути на свои файлы (например: images/tima/01.jpg и images/anechka/01.jpg)
+    // - Альбом: положите 50 фото в images/album/01.jpg ... 50.jpg
+    const svgPlaceholder = (label) => {
+        const svg = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="800" height="800">
+            <defs>
+              <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#ff85c1" stop-opacity="0.95"/>
+                <stop offset="1" stop-color="#b77dff" stop-opacity="0.95"/>
+              </linearGradient>
+            </defs>
+            <rect width="800" height="800" rx="80" fill="url(#g)"/>
+            <circle cx="600" cy="210" r="120" fill="rgba(255,255,255,0.18)"/>
+            <circle cx="220" cy="560" r="180" fill="rgba(0,0,0,0.12)"/>
+            <text x="50%" y="52%" text-anchor="middle" font-family="Inter, system-ui, -apple-system, Segoe UI, Arial" font-size="52" font-weight="800" fill="rgba(255,255,255,0.92)">
+              ${label}
+            </text>
+            <text x="50%" y="61%" text-anchor="middle" font-family="Inter, system-ui, -apple-system, Segoe UI, Arial" font-size="26" font-weight="600" fill="rgba(255,255,255,0.82)">
+              (замени на своё фото)
+            </text>
+          </svg>
+        `.trim();
+        return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    };
+
+    function buildMarqueeFromUrls(containerId, urls) {
+        const row = document.getElementById(containerId);
+        if (!row) return;
+        row.innerHTML = '';
+
+        // Дублируем список, чтобы анимация выглядела бесшовно (0..50%)
+        const doubled = urls.concat(urls);
+        doubled.forEach((src, idx) => {
+            const card = document.createElement('div');
+            card.className = 'marquee-card';
+
+            const img = document.createElement('img');
+            img.loading = 'lazy';
+            img.alt = `Фото ${idx + 1}`;
+            img.src = src;
+
+            card.appendChild(img);
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openModal(img.src, img.alt);
+            });
+            row.appendChild(card);
+        });
+    }
+
+    // Плейсхолдеры до загрузки
+    buildMarqueeFromUrls('marqueeLeft', Array.from({length: 10}, (_, i) => svgPlaceholder(`Фото ${i+1}`)));
+    buildMarqueeFromUrls('marqueeRight', Array.from({length: 10}, (_, i) => svgPlaceholder(`Фото ${i+1}`)));
+
+    function attachMarqueePicker(pickerId, marqueeId) {
+        const picker = document.getElementById(pickerId);
+        if (!picker) return;
+        picker.addEventListener('change', () => {
+            const files = Array.from(picker.files || []);
+            if (!files.length) return;
+            files.sort((a, b) => a.name.localeCompare(b.name, 'ru', { numeric: true, sensitivity: 'base' }));
+            const urls = files.map((f) => URL.createObjectURL(f));
+            buildMarqueeFromUrls(marqueeId, urls);
+        });
+    }
+
+    attachMarqueePicker('marqueeLeftPicker', 'marqueeLeft');
+    attachMarqueePicker('marqueeRightPicker', 'marqueeRight');
+
+    // --------------------------------------------------------------
+    // Альбом: можно загрузить фото без переименования (через выбор файлов)
+    const albumGrid = document.getElementById('albumGrid');
+    if (albumGrid) {
+        function renderAlbumFromUrls(urls) {
+            albumGrid.innerHTML = '';
+            urls.forEach((src, idx) => {
+                const n = idx + 1;
+                const item = document.createElement('div');
+                item.className = 'album-item';
+
+                const num = document.createElement('div');
+                num.className = 'album-num';
+                num.innerText = `#${n}`;
+
+                const img = document.createElement('img');
+                img.loading = 'lazy';
+                img.alt = `Фото ${n}`;
+                img.src = src;
+
+                item.appendChild(img);
+                item.appendChild(num);
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openModal(img.src, `Фото ${n}`);
+                });
+                albumGrid.appendChild(item);
+            });
+        }
+
+        // Плейсхолдеры до загрузки
+        renderAlbumFromUrls(Array.from({length: 50}, (_, i) => svgPlaceholder(`Фото ${i+1}`)));
+
+        const albumPicker = document.getElementById('albumPicker');
+        if (albumPicker) {
+            albumPicker.addEventListener('change', () => {
+                const files = Array.from(albumPicker.files || []);
+                if (!files.length) return;
+
+                // сортировка по имени файла (как в проводнике)
+                files.sort((a, b) => a.name.localeCompare(b.name, 'ru', { numeric: true, sensitivity: 'base' }));
+
+                const urls = files.map((f) => URL.createObjectURL(f));
+                renderAlbumFromUrls(urls);
+            });
+        }
+    }
+    
+    // Модалка
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImg');
+    const closeModalBtn = document.querySelector('.close-modal');
+    
+    function openModal(imgUrl, captionText) {
+        modal.style.display = 'flex';
+        modalImg.src = imgUrl;
+        modalImg.alt = captionText;
+        // можно добавить подпись внутри, но и так ок
+    }
+    closeModalBtn.onclick = () => {
+        modal.style.display = 'none';
+    }
+    modal.onclick = (e) => {
+        if(e.target === modal) modal.style.display = 'none';
+    }
+    
+    // СЮРПРИЗ: летающие сердечки + всплывающее сообщение
+    const surpriseBtn = document.getElementById('surpriseBtn');
+    surpriseBtn.addEventListener('click', () => {
+        // создаём много сердечек
+        for(let i=0; i<35; i++) {
+            createFloatingHeart();
+        }
+        // также красивое уведомление
+        const notif = document.createElement('div');
+        notif.innerText = '💗люблю тебя принцессочка! 💗';
+        notif.style.position = 'fixed';
+        notif.style.bottom = '30%';
+        notif.style.left = '50%';
+        notif.style.transform = 'translateX(-50%)';
+        notif.style.backgroundColor = '#ff4d8f';
+        notif.style.color = 'white';
+        notif.style.padding = '1rem 2rem';
+        notif.style.borderRadius = '60px';
+        notif.style.fontWeight = 'bold';
+        notif.style.fontSize = '1.4rem';
+        notif.style.zIndex = '1001';
+        notif.style.boxShadow = '0 0 30px #ff85c1';
+        notif.style.backdropFilter = 'blur(12px)';
+        notif.style.border = '2px solid white';
+        notif.style.fontFamily = 'inherit';
+        notif.style.textAlign = 'center';
+        notif.style.whiteSpace = 'nowrap';
+        document.body.appendChild(notif);
+        setTimeout(() => {
+            notif.style.opacity = '0';
+            notif.style.transition = '0.5s';
+            setTimeout(() => notif.remove(), 600);
+        }, 2800);
+        
+        // дополнительно добавим конфетти-эффект простой
+        for(let s=0; s<50; s++) {
+            const conf = document.createElement('div');
+            conf.innerHTML = ['🌸','💖','✨','💗','⭐','🌹','💘'][Math.floor(Math.random()*7)];
+            conf.style.position = 'fixed';
+            conf.style.left = Math.random() * 100 + '%';
+            conf.style.top = '-30px';
+            conf.style.fontSize = (Math.random() * 20 + 16) + 'px';
+            conf.style.pointerEvents = 'none';
+            conf.style.zIndex = '1002';
+            conf.style.animation = `floatHeart ${Math.random() * 1.5 + 1.5}s linear forwards`;
+            document.body.appendChild(conf);
+            setTimeout(() => conf.remove(), 2500);
+        }
+    });
+    
+    function createFloatingHeart() {
+        const heart = document.createElement('div');
+        heart.innerHTML = ['❤️','💖','💗','💓','💘','💝','🌸','✨'][Math.floor(Math.random()*8)];
+        heart.style.position = 'fixed';
+        heart.style.bottom = '-20px';
+        heart.style.left = Math.random() * 100 + '%';
+        heart.style.fontSize = (Math.random() * 20 + 18) + 'px';
+        heart.style.pointerEvents = 'none';
+        heart.style.zIndex = '999';
+        heart.style.animation = `floatHeart ${Math.random() * 2 + 2}s ease-out forwards`;
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 3000);
+    }
+    
+    // добавим дополнительный стиль для анимации падения сердечек
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = `
+        @keyframes floatHeart {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; bottom: -20px; }
+            100% { transform: translateY(-700px) rotate(20deg); opacity: 0; bottom: 110%; }
+        }
+    `;
+    document.head.appendChild(styleSheet);
+    
+    // небольшой автоподсчет времени вместе с эффектом "обновление каждую секунду красиво"
+    // создаём эффект переливания градиента в таймере
+    const timerNumbers = document.querySelectorAll('.timer-number');
+    setInterval(() => {
+        timerNumbers.forEach(el => {
+            el.style.transition = '0.1s';
+            el.style.textShadow = '0 0 6px #ff99dd';
+            setTimeout(() => { if(el) el.style.textShadow = 'none'; }, 150);
+        });
+    }, 1000);
+    
+    console.log("Сайт любви запущен!");
+</script>
+</body>
+</html>
