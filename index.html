@@ -706,7 +706,7 @@
     if (albumGrid) {
         const albumTotal = 48;
         const albumPhotos = Array.from({ length: albumTotal }, (_, i) => {
-            const n = albumTotal - i; // обратный порядок: 48..1
+            const n = i + 1; // правильный порядок: 1..48
             const file = `images/album/jpg${n}.jpg`;
             return { n, file, fallback: svgPlaceholder(`Фото ${n}`) };
         });
