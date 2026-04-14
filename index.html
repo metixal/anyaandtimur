@@ -214,14 +214,6 @@
             box-shadow: 0 22px 46px -24px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05) inset;
         }
         .marquee + .marquee { margin-top: 14px; }
-        .marquee-controls{
-            display:flex;
-            align-items:center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-top: 12px;
-        }
-        .marquee-controls .file-hint{ font-size: 0.9rem; opacity: 0.9; }
         .marquee-row {
             display: flex;
             align-items: center;
@@ -317,33 +309,7 @@
             backdrop-filter: blur(6px);
             box-shadow: 0 22px 46px -24px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05) inset;
         }
-        .album-controls{
-            display:flex;
-            flex-wrap:wrap;
-            align-items:center;
-            justify-content: space-between;
-            gap: 12px;
-            margin: 10px 6px 16px;
-        }
-        .file-btn{
-            display:inline-flex;
-            align-items:center;
-            gap:10px;
-            padding: 10px 14px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.18);
-            background: rgba(0,0,0,0.18);
-            color: rgba(255,255,255,0.88);
-            cursor:pointer;
-            user-select:none;
-            transition: transform 0.15s ease, background 0.15s ease;
-        }
-        .file-btn:hover{ transform: translateY(-1px); background: rgba(0,0,0,0.26); }
-        .file-hint{
-            font-size: 0.95rem;
-            color: rgba(255,255,255,0.78);
-        }
-        .file-input{ display:none; }
+        /* (убрано) управление загрузкой файлов */
         .album-grid {
             column-count: 2;
             column-gap: 14px;
@@ -492,19 +458,9 @@
     <div class="section-sub">Здесь будут ваши фото. Наведи курсор — лента остановится. Кликни — откроется крупно.</div>
     <div class="marquee" aria-label="Фото-лента Тима">
         <div class="marquee-row" id="marqueeLeft"></div>
-        <div class="marquee-controls">
-            <label class="file-btn" for="marqueeLeftPicker"><i class="fas fa-upload"></i> Выбрать фото для ленты 1</label>
-            <input class="file-input" id="marqueeLeftPicker" type="file" accept="image/*" multiple />
-            <div class="file-hint">Выдели несколько фото.</div>
-        </div>
     </div>
     <div class="marquee" aria-label="Фото-лента Анечка">
         <div class="marquee-row reverse" id="marqueeRight"></div>
-        <div class="marquee-controls">
-            <label class="file-btn" for="marqueeRightPicker"><i class="fas fa-upload"></i> Выбрать фото для ленты 2</label>
-            <input class="file-input" id="marqueeRightPicker" type="file" accept="image/*" multiple />
-            <div class="file-hint">Можно другие фото.</div>
-        </div>
     </div>
 
     <!-- SoundCloud -->
@@ -543,13 +499,8 @@
     <div class="section-title">
         <i class="fas fa-images"></i> Альбом из 50 фото
     </div>
-    <div class="section-sub">Чтобы не переименовывать файлы — просто выбери все фото разом, и они сразу появятся здесь.</div>
+    <div class="section-sub">Положи фото в <b>images/album</b> с именами <b>jpg1.jpg</b> … <b>jpg50.jpg</b> — и всё подхватится автоматически.</div>
     <div class="album">
-        <div class="album-controls">
-            <label class="file-btn" for="albumPicker"><i class="fas fa-upload"></i> Выбрать фото для альбома</label>
-            <input class="file-input" id="albumPicker" type="file" accept="image/*" multiple />
-            <div class="file-hint">Можно выделить сразу все 50 (или сколько есть).</div>
-        </div>
         <div class="album-grid" id="albumGrid"></div>
     </div>
 
@@ -703,71 +654,87 @@
         });
     }
 
-    // Плейсхолдеры до загрузки
-    buildMarqueeFromUrls('marqueeLeft', Array.from({length: 10}, (_, i) => svgPlaceholder(`Фото ${i+1}`)));
-    buildMarqueeFromUrls('marqueeRight', Array.from({length: 10}, (_, i) => svgPlaceholder(`Фото ${i+1}`)));
+    // Ленты по файлам (без загрузки): images/strip1/jpg1.jpg... и images/strip2/jpg1.jpg...
+    const strip1 = Array.from({ length: 12 }, (_, i) => `images/strip1/jpg${i + 1}.jpg`);
+    const strip2 = Array.from({ length: 12 }, (_, i) => `images/strip2/jpg${i + 1}.jpg`);
 
-    function attachMarqueePicker(pickerId, marqueeId) {
-        const picker = document.getElementById(pickerId);
-        if (!picker) return;
-        picker.addEventListener('change', () => {
-            const files = Array.from(picker.files || []);
-            if (!files.length) return;
-            files.sort((a, b) => a.name.localeCompare(b.name, 'ru', { numeric: true, sensitivity: 'base' }));
-            const urls = files.map((f) => URL.createObjectURL(f));
-            buildMarqueeFromUrls(marqueeId, urls);
+    // если каких-то файлов нет — показываем плейсхолдер
+    function withFallback(urls) {
+        return urls.map((u, i) => {
+            const fallback = svgPlaceholder(`Фото ${i + 1}`);
+            // предварительная проверка не нужна; img сам покажет fallback через onerror в модалке не требуется
+            return { url: u, fallback };
+        });
+    }
+    function buildMarqueeFromFiles(containerId, items) {
+        const urls = [];
+        items.forEach((it) => {
+            urls.push(it.url);
+        });
+        // рисуем сначала fallback, затем подменяем на реальный файл если он грузится
+        const row = document.getElementById(containerId);
+        if (!row) return;
+        row.innerHTML = '';
+        const doubled = items.concat(items);
+        doubled.forEach((it, idx) => {
+            const card = document.createElement('div');
+            card.className = 'marquee-card';
+            const img = document.createElement('img');
+            img.loading = 'lazy';
+            img.alt = `Фото ${idx + 1}`;
+            img.src = it.fallback;
+            const real = new Image();
+            real.onload = () => { img.src = it.url; };
+            real.src = it.url;
+            card.appendChild(img);
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openModal(img.src, img.alt);
+            });
+            row.appendChild(card);
         });
     }
 
-    attachMarqueePicker('marqueeLeftPicker', 'marqueeLeft');
-    attachMarqueePicker('marqueeRightPicker', 'marqueeRight');
+    buildMarqueeFromFiles('marqueeLeft', withFallback(strip1));
+    buildMarqueeFromFiles('marqueeRight', withFallback(strip2));
 
     // --------------------------------------------------------------
-    // Альбом: можно загрузить фото без переименования (через выбор файлов)
+    // Альбом по файлам: images/album/jpg1.jpg ... jpg50.jpg
     const albumGrid = document.getElementById('albumGrid');
     if (albumGrid) {
-        function renderAlbumFromUrls(urls) {
-            albumGrid.innerHTML = '';
-            urls.forEach((src, idx) => {
-                const n = idx + 1;
-                const item = document.createElement('div');
-                item.className = 'album-item';
+        const albumPhotos = Array.from({ length: 50 }, (_, i) => {
+            const n = i + 1;
+            const file = `images/album/jpg${n}.jpg`;
+            return { n, file, fallback: svgPlaceholder(`Фото ${n}`) };
+        });
 
-                const num = document.createElement('div');
-                num.className = 'album-num';
-                num.innerText = `#${n}`;
+        albumGrid.innerHTML = '';
+        albumPhotos.forEach((p) => {
+            const item = document.createElement('div');
+            item.className = 'album-item';
 
-                const img = document.createElement('img');
-                img.loading = 'lazy';
-                img.alt = `Фото ${n}`;
-                img.src = src;
+            const num = document.createElement('div');
+            num.className = 'album-num';
+            num.innerText = `#${p.n}`;
 
-                item.appendChild(img);
-                item.appendChild(num);
-                item.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    openModal(img.src, `Фото ${n}`);
-                });
-                albumGrid.appendChild(item);
+            const img = document.createElement('img');
+            img.loading = 'lazy';
+            img.alt = `Фото ${p.n}`;
+            img.src = p.fallback;
+
+            const real = new Image();
+            real.onload = () => { img.src = p.file; };
+            real.src = p.file;
+
+            item.appendChild(img);
+            item.appendChild(num);
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openModal(img.src, `Фото ${p.n}`);
             });
-        }
 
-        // Плейсхолдеры до загрузки
-        renderAlbumFromUrls(Array.from({length: 50}, (_, i) => svgPlaceholder(`Фото ${i+1}`)));
-
-        const albumPicker = document.getElementById('albumPicker');
-        if (albumPicker) {
-            albumPicker.addEventListener('change', () => {
-                const files = Array.from(albumPicker.files || []);
-                if (!files.length) return;
-
-                // сортировка по имени файла (как в проводнике)
-                files.sort((a, b) => a.name.localeCompare(b.name, 'ru', { numeric: true, sensitivity: 'base' }));
-
-                const urls = files.map((f) => URL.createObjectURL(f));
-                renderAlbumFromUrls(urls);
-            });
-        }
+            albumGrid.appendChild(item);
+        });
     }
     
     // Модалка
