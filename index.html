@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+                                        <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -427,6 +427,177 @@
             0% { transform: translateY(0px); opacity: 0.7;}
             100% { transform: translateY(-35px); opacity: 0;}
         }
+
+        /* панель соцсетей справа */
+        .social-toggle-btn {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            z-index: 600;
+            width: 44px;
+            height: 72px;
+            border: none;
+            border-radius: 18px 0 0 18px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: #fff;
+            background: linear-gradient(135deg, rgba(255,79,154,0.95), rgba(176,123,255,0.92));
+            box-shadow: -4px 0 22px rgba(255,79,154,0.35);
+            transition: transform 0.28s ease, opacity 0.28s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .social-toggle-btn:hover {
+            box-shadow: -6px 0 28px rgba(255,79,154,0.45);
+            transform: translateY(-50%) translateX(-2px);
+        }
+        .social-toggle-btn.is-hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-50%) translateX(12px);
+        }
+
+        .social-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 540;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+        .social-backdrop.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .social-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: min(340px, 92vw);
+            height: 100%;
+            z-index: 550;
+            background: var(--romantic-panel);
+            backdrop-filter: blur(14px);
+            border-left: 1px solid rgba(255,255,255,0.16);
+            box-shadow: -12px 0 40px rgba(0,0,0,0.45);
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 1.25rem 2rem;
+            overflow-y: auto;
+        }
+        .social-drawer.is-open {
+            transform: translateX(0);
+        }
+        .social-drawer-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+        .social-close-btn {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.15rem;
+            color: #fff;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.18);
+            transition: background 0.2s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .social-close-btn:hover {
+            background: rgba(255,79,154,0.35);
+            transform: scale(1.05);
+        }
+        .social-drawer-title {
+            font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+            font-size: 1.55rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.95);
+            line-height: 1.2;
+        }
+        .social-person {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 22px;
+            padding: 1.1rem 1rem;
+            margin-bottom: 1rem;
+        }
+        .social-person h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,203,232,0.95);
+        }
+        .social-person h3 i {
+            color: var(--accent);
+        }
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            text-decoration: none;
+            color: rgba(255,255,255,0.92);
+            background: rgba(0,0,0,0.22);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+        .social-link:hover {
+            background: rgba(255,79,154,0.22);
+            border-color: rgba(255,79,154,0.45);
+            transform: translateX(-3px);
+        }
+        .social-link i {
+            font-size: 1.35rem;
+            width: 28px;
+            text-align: center;
+        }
+        .social-link .fa-tiktok { color: #ff4f9a; }
+        .social-link .fa-telegram { color: #6ec5ff; }
+        .social-link-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.72;
+            display: block;
+        }
+        .social-link-handle {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .social-drawer-note {
+            margin-top: auto;
+            padding-top: 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+            opacity: 0.65;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -513,6 +684,63 @@
     <span class="close-modal">&times;</span>
     <img id="modalImg" src="" alt="увеличенное фото">
 </div>
+
+<button type="button" class="social-toggle-btn" id="socialOpenBtn" aria-label="Открыть соцсети" aria-expanded="false" aria-controls="socialDrawer">
+    <i class="fas fa-arrow-left" aria-hidden="true"></i>
+</button>
+
+<div class="social-backdrop" id="socialBackdrop" aria-hidden="true"></div>
+
+<aside class="social-drawer" id="socialDrawer" aria-hidden="true">
+    <div class="social-drawer-header">
+        <button type="button" class="social-close-btn" id="socialCloseBtn" aria-label="Закрыть">
+            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </button>
+        <h2 class="social-drawer-title">Мы в сети</h2>
+    </div>
+
+    <div class="social-person">
+        <h3><i class="fas fa-heart"></i> Тима</h3>
+        <div class="social-links">
+            <a class="social-link" href="https://www.tiktok.com/@mwtx3222" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-tiktok"></i>
+                <span>
+                    <span class="social-link-label">TikTok</span>
+                    <span class="social-link-handle">@mwtx3222</span>
+                </span>
+            </a>
+            <a class="social-link" href="https://t.me/metix69" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-telegram"></i>
+                <span>
+                    <span class="social-link-label">Telegram</span>
+                    <span class="social-link-handle">@metix69</span>
+                </span>
+            </a>
+        </div>
+    </div>
+
+    <div class="social-person">
+        <h3><i class="fas fa-heart"></i> Анечка</h3>
+        <div class="social-links">
+            <a class="social-link" href="https://www.tiktok.com/@nisakkiii" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-tiktok"></i>
+                <span>
+                    <span class="social-link-label">TikTok</span>
+                    <span class="social-link-handle">@nisakkiii</span>
+                </span>
+            </a>
+            <a class="social-link" href="https://t.me/nisaki67" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-telegram"></i>
+                <span>
+                    <span class="social-link-label">Telegram</span>
+                    <span class="social-link-handle">@nisaki67</span>
+                </span>
+            </a>
+        </div>
+    </div>
+
+    <p class="social-drawer-note">Нажми на ссылку — откроется в новой вкладке</p>
+</aside>
 
 <div class="floating-hearts" id="floatingHeart">💖</div>
 
@@ -843,6 +1071,40 @@
         });
     }, 1000);
     
+    // Панель соцсетей
+    (function initSocialDrawer() {
+        const drawer = document.getElementById('socialDrawer');
+        const backdrop = document.getElementById('socialBackdrop');
+        const openBtn = document.getElementById('socialOpenBtn');
+        const closeBtn = document.getElementById('socialCloseBtn');
+        if (!drawer || !backdrop || !openBtn || !closeBtn) return;
+
+        function openDrawer() {
+            drawer.classList.add('is-open');
+            drawer.setAttribute('aria-hidden', 'false');
+            backdrop.classList.add('is-visible');
+            backdrop.setAttribute('aria-hidden', 'false');
+            openBtn.classList.add('is-hidden');
+            openBtn.setAttribute('aria-expanded', 'true');
+        }
+
+        function closeDrawer() {
+            drawer.classList.remove('is-open');
+            drawer.setAttribute('aria-hidden', 'true');
+            backdrop.classList.remove('is-visible');
+            backdrop.setAttribute('aria-hidden', 'true');
+            openBtn.classList.remove('is-hidden');
+            openBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        openBtn.addEventListener('click', openDrawer);
+        closeBtn.addEventListener('click', closeDrawer);
+        backdrop.addEventListener('click', closeDrawer);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer();
+        });
+    })();
+
     console.log("Сайт любви запущен!");
 </script>
 </body>
